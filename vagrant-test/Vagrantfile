@@ -1,0 +1,37 @@
+Vagrant.configure("2") do |config|
+  # Define the first machine
+  config.vm.define "test-vagrant" do |test1|
+    test1.vm.box = "ubuntu/jammy64"
+    test1.vm.hostname = "test-vagrant"
+    test1.vm.network "public_network", ip: "192.168.0.210", bridge: "eno3"
+    test1.vm.network "forwarded_port", guest: 8070, host: 8070 # Forwarding port 8070
+
+    test1.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 4
+    end
+
+    # Set the default password using shell provisioning
+    test1.vm.provision "shell", inline: <<-SHELL
+      echo "vagrant:comfac123" | sudo chpasswd
+    SHELL
+  end
+
+  # Define the second machine
+  config.vm.define "test2-vagrant" do |test2|
+    test2.vm.box = "ubuntu/jammy64"
+    test2.vm.hostname = "test2-vagrant"
+    test2.vm.network "public_network", ip: "192.168.0.214", bridge: "eno3"
+    test2.vm.network "forwarded_port", guest: 8070, host: 8071 # Forwarding port 8070 to a different host port
+
+    test2.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 4
+    end
+
+    # Set the default password using shell provisioning
+    test2.vm.provision "shell", inline: <<-SHELL
+      echo "vagrant:comfac1234" | sudo chpasswd
+    SHELL
+  end
+end

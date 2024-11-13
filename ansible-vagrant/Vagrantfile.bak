@@ -1,0 +1,45 @@
+Vagrant.configure("2") do |config|
+  # Define the Ansible controller machine
+  config.vm.define "ansible-controller" do |ansible|
+    ansible.vm.box = "ubuntu/jammy64"
+    ansible.vm.hostname = "ansible-controller"
+    ansible.vm.network "public_network", ip: "192.168.0.212", bridge: "eno3"
+    ansible.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+      vb.cpus = 4
+    end
+
+    # Provisioning to update, upgrade, install Ansible, set password, and create files
+    ansible.vm.provision "shell", inline: <<-SHELL
+      # Update and upgrade the system
+      sudo apt-get update -y
+      sudo apt-get upgrade -y
+
+      # Set the password for the vagrant user
+      echo "vagrant:comfac123" | sudo chpasswd
+
+      # Install Ansible
+      sudo apt-get install -y software-properties-common
+      sudo add-apt-repository --yes --update ppa:ansible/ansible
+      sudo apt-get install -y ansible
+
+      # Create Ansible hosts inventory file
+      sudo mkdir -p /etc/ansible
+      cat <<EOF > /etc/ansible/hosts
+[test-machines]
+test-vagrant ansible_host=192.168.0.210 ansible_user=vagrant ansible_ssh_pass=comfac123
+test2-vagrant ansible_host=192.168.0.211 ansible_user=vagrant ansible_ssh_pass=comfac123
+EOF
+
+      # Create Ansible playbook to ping both VMs
+      cat <<EOF > /etc/ansible/ping_playbook.yml
+---
+- name: Test connectivity to test machines
+  hosts: test-machines
+  tasks:
+    - name: Ping test machines
+      ansible.builtin.ping:
+EOF
+    SHELL
+  end
+end
