@@ -3,7 +3,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "ansible2-controller" do |ansible|
     ansible.vm.box = "ubuntu/jammy64"
     ansible.vm.hostname = "ansible-controller"
-    ansible.vm.network "public_network", ip: "192.168.0.213", bridge: "eno3"
+    ansible.vm.network "public_network", ip: "192.168.110.213", bridge: "eno3" #add custom ip that is not used in your network (because it is bridge mode) & the network adapter that you are using
     ansible.vm.network "forwarded_port", guest: 8070, host: 8074 # Forwarding port 8070 to a different host port
 
     ansible.vm.provider "virtualbox" do |vb|
@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
       sudo apt-get upgrade -y
 
       # Set the password for the vagrant user
-      echo "vagrant:comfac123" | sudo chpasswd
+      echo "vagrant:pass123" | sudo chpasswd
 
       # Install Ansible
       sudo apt-get install -y software-properties-common

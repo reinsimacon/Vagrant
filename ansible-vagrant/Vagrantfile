@@ -3,7 +3,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "ansible-controller" do |ansible|
     ansible.vm.box = "ubuntu/jammy64"
     ansible.vm.hostname = "ansible-controller"
-    ansible.vm.network "public_network", ip: "192.168.0.212", bridge: "eno3"
+    ansible.vm.network "public_network", ip: "192.168.110.212", bridge: "eno3" #add custom ip that is not used in your network (because it is bridge mode) & the network adapter that you are using
     ansible.vm.network "forwarded_port", guest: 8070, host: 8072 # Forwarding port 8070 to a different host port
 
     ansible.vm.provider "virtualbox" do |vb|
@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
       sudo apt-get upgrade -y
 
       # Set the password for the vagrant user
-      echo "vagrant:comfac123" | sudo chpasswd
+      echo "vagrant:pass123" | sudo chpasswd
 
       # Install Ansible
       sudo apt-get install -y software-properties-common
@@ -29,8 +29,8 @@ Vagrant.configure("2") do |config|
       sudo mkdir -p /etc/ansible
       cat <<EOF > /etc/ansible/hosts
 [test-machines]
-test-vagrant ansible_host=192.168.0.210 ansible_user=vagrant ansible_ssh_pass=comfac123
-test2-vagrant ansible_host=192.168.0.211 ansible_user=vagrant ansible_ssh_pass=comfac123
+test-vagrant ansible_host=192.168.110.210 ansible_user=vagrant ansible_ssh_pass=pass123
+test2-vagrant ansible_host=192.168.110.211 ansible_user=vagrant ansible_ssh_pass=pass123
 EOF
 
       # Create Ansible playbook to ping both VMs
